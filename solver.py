@@ -2,7 +2,6 @@ import sys
 import puzz
 import pdqpq
 
-
 MAX_SEARCH_ITERS = 100000
 GOAL_STATE = puzz.EightPuzzleBoard("012345678")
 
@@ -35,21 +34,38 @@ def solve_puzzle(start_state, strategy):
             'expanded_count' - the number of unique states removed from the frontier and expanded 
                 (successors generated).
     """
-    results = {
-        'path': [],
-        'path_cost': 0,
-        'frontier_count': 0,
-        'expanded_count': 0,
-    }
+    
     if(strategy == "bfs"):
         results = bfs_search(start_state)
 
     
-    # 
-    # fill in the function body here
-    #
+    
     return results
 def bfs_search(start_state):
+    results = {'path' : [],
+               'path_cost':0,
+               'frontier_count': 0,
+               'expanded_count': 0,
+    
+    }
+    frontier = []
+    frontier.append(start_state)
+    explored = {}
+    results['path'].append(start_state)
+    results['path_cost'] = 0
+    results['frontier_count'] = 1
+    if start_state == GOAL_STATE:
+        return results
+    
+    
+    
+    
+
+
+    
+    
+
+
     
 
 
@@ -76,3 +92,4 @@ if __name__ == '__main__':
     print("solving puzzle {} -> {}".format(start, GOAL_STATE))
     results = solve_puzzle(start, method)
     print_summary(results)
+
