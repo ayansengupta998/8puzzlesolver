@@ -130,12 +130,13 @@ def recurser(current_state, q, results, frontier, explored, move):
         for key in successors:
             #get each successor
             new_state = successors[key]
-            #add every expanded state to the frontier
-            frontier.add(new_state)
-            h = heuristic(new_state, 1)
-            g = cost(current_state, new_state)
-            f = g + h
-            q.add((new_state, key), f)
+            if new_state not in frontier:
+                h = heuristic(new_state, 1)
+                g = cost(current_state, new_state)
+                f = g + h
+                #add every expanded state to the frontier
+                frontier.add(new_state)
+                q.add((new_state, key), f)
     print("Explored is", explored)
     print("Queue is ",q)
     results['path'].append((q.pq[0][2][1],q.pq[0][2][0]))
