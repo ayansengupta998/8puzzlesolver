@@ -46,7 +46,12 @@ def solve_puzzle(start_state, strategy):
     
     if(strategy == "bfs"):
         results = bfs_search(start_state)
-
+    elif strategy == "astar-h1":
+        results = astar_h1(start_state)
+    elif strategy == "astar-h2":
+        results = astar_h2(start_state)
+    elif strategy == "astar-h3":
+        results = astar_h3(start_state)   
     
     
     return results
@@ -98,6 +103,113 @@ def bfs_search(start_state):
             results['path_cost'] = results['path_cost'] + (tile_movecost*tile_movecost)
         return results
             
+def astar_h1(start_state):
+    results = {'path' : [],
+               'path_cost':0,
+               'frontier_count': 0,
+               'expanded_count': 0,
+    }
+    q =pdqpq.PriorityQueue()#define a priority queue q which is empty
+    #define two sets, frontier and explored
+    frontier = set()
+    explored = []
+    frontier.add(start_state)
+    results['path'].append(('start',start_state))
+    recurser(start_state, q, results, frontier, explored,'')
+    results['frontier_count'] = len(frontier)
+    results['expanded_count'] = len(explored)
+    return results
+
+def recurser(current_state, q, results, frontier, explored, move):
+    if str(GOAL_STATE) == str(current_state) or (str(current_state) in explored and q.empty()):
+        return
+    if str(current_state) not in explored:
+        explored.append(str(current_state))
+        #explore the unexplored states
+        successors = current_state.successors()
+        for key in successors:
+            #get each successor
+            new_state = successors[key]
+            #add every expanded state to the frontier
+            frontier.add(new_state)
+            h = heuristic(new_state, 1)
+            g = cost(current_state, new_state)
+            f = g + h
+            q.add((new_state, key), f)
+    print("Explored is", explored)
+    print("Queue is ",q)
+    results['path'].append((q.pq[0][2][1],q.pq[0][2][0]))
+    moveCost = q.pq[0][0]
+    results['path_cost'] += moveCost
+    node = q.pop()
+    recurser(node[0],q,results,frontier, explored,node[1])
+
+def astar_h2(start_state):
+    results = {'path' : [],
+               'path_cost':0,
+               'frontier_count': 0,
+               'expanded_count': 0,
+    
+    }    
+    q =pdqpq.PriorityQueue()
+    heuristic(start_state, 2)
+
+    return results
+
+    
+def astar_h3(start_state):
+    results = {'path' : [],
+               'path_cost':0,
+               'frontier_count': 0,
+               'expanded_count': 0,
+    
+    }    
+    q =pdqpq.PriorityQueue()
+    heuristic(start_state, 3)
+    return results
+
+#helper funciton to calculate the 3 different heuristics as selected
+def heuristic(state, h):
+    val = 0
+    stateString = str(state)
+    goalString = str(GOAL_STATE)
+    if h == 1:
+        #number of misplaced tiles
+        for i in range(0,len(stateString)):
+            if stateString[i] != goalString[i]:
+                val+=1
+    elif h == 2:
+        #Manhattan distance
+        for i in range(0,len(stateString)):
+            tile = stateString[i]
+            if stateString[i] != goalString[i]:
+                x = state.find(tile)[0]
+                y = state.find(tile)[1]
+                xg= GOAL_STATE.find(tile)[0]
+                yg = GOAL_STATE.find(tile)[1]
+                val += abs(x-xg) + abs(y-yg)
+    elif h == 3:
+        #modified Manhattan distance
+        for i in range(0,len(stateString)):
+            tile = stateString[i]
+            if stateString[i] != goalString[i]:
+                x = state.find(tile)[0]
+                y = state.find(tile)[1]
+                xg= GOAL_STATE.find(tile)[0]
+                yg = GOAL_STATE.find(tile)[1]
+                val += (abs(x-xg) + abs(y-yg)) * (int(tile)**2)
+    return val
+
+def cost(current_state, next_state):
+    current_stateString = str(current_state)
+    next_stateString = str(next_state)
+    for i in range(0,len(current_stateString)):
+        if current_stateString[i] != next_stateString[i]:
+            if int(current_stateString[i])>0:
+                return int(current_stateString[i])**2
+            else:
+                return int(next_stateString[i])**2
+    return 0
 
 
             
