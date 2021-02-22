@@ -2,11 +2,17 @@ import sys
 import puzz
 import pdqpq
 import random
-from goto import goto, comefrom, label
+
 
 
 MAX_SEARCH_ITERS = 100000
 GOAL_STATE = puzz.EightPuzzleBoard("012345678")
+results = {'path' : [],
+               'path_cost':0,
+               'frontier_count': 0,
+               'expanded_count': 0,
+    
+    }
 
 
 def solve_puzzle(start_state, strategy):
@@ -45,39 +51,29 @@ def solve_puzzle(start_state, strategy):
     
     return results
 def bfs_search(start_state):
-    results = {'path' : [],
-               'path_cost':0,
-               'frontier_count': 0,
-               'expanded_count': 0,
     
-    }
     frontier = []
-    # frontier.append(start_state)
     explored = []
     frontier.append(("start",start_state))
-    results['path_cost'] = 0
-    results['frontier_count'] = 1
-    if start_state == GOAL_STATE:
+    if start_state == GOAL_STATE:#edge case to check if start state is the goal state 
+        results['path'].append(("start",start_state))
+        results['frontier_count'] = 1
         return results
     else:
         while len(frontier) != 0: #check if the frontier is empty 
             node = frontier.pop(0) #pop index 0 of the frontir because bfs uses FIFO strategy
             explored.append(node)#add popped node to explored list
-            results['path'].append(node)
-            results['expanded_count'] = results['expanded_count'] +1 #increment expanded count by 1 
-            if(len(frontier)==0):
-                goto expand
-            str_node = str(node[1])
-            index = str_node.find("0") #index of where the 0 appears
+            results['path'].append(node) #add popped node to the path since it the node was taken next
+            results['expanded_count'] = results['expanded_count'] +1 #increment expanded count by 1          
+            # str_node = str(explored[-1][1])
+            # index = str_node.find("0") #index of where the 0 appears
             succ = node[1].successors()#maintain a dictionary of all successors
             #now need to expand popped node 
             nextState_list = [(k,v) for k,v in succ.items()] #make a list of all  the possible successors
-            random.shuffle(nextState_list)#randomize the order 
-            temp_next_state = str(frontier[0][1])
-            cost = int(temp_next_state[index])
-            results['path_cost'] = results['path_cost'] + (cost*cost)
-            label .expand
-            for i in nextState_list:
+            # temp_next_state = str(nextState_list[0][1])
+            # cost = int(temp_next_state[index])
+            # results['path_cost'] = results['path_cost'] + (cost*cost)
+            for i in nextState_list: #expand popped node
                 if(i not in frontier) and (i not in explored):
                     if(i[1] == GOAL_STATE):
                         results['path'].append(i)
@@ -93,6 +89,19 @@ def bfs_search(start_state):
                     else:
                         frontier.append(i)
                         results["frontier_count"] = results["frontier_count"] + 1
+            #finding cost per move
+            print(results)
+            str_node = str(node[1])
+            index = str_node.find("0")
+            nxt_state = str(frontier[0][1])
+            tile_movecost = int(nxt_state[index])
+            results['path_cost'] = results['path_cost'] + (tile_movecost*tile_movecost)
+        return results
+            
+
+
+            
+            
 
                     
 def print_summary(results):
