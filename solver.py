@@ -1,6 +1,9 @@
 import sys
 import puzz
 import pdqpq
+import random
+from goto import goto, comefrom, label
+
 
 MAX_SEARCH_ITERS = 100000
 GOAL_STATE = puzz.EightPuzzleBoard("012345678")
@@ -49,27 +52,49 @@ def bfs_search(start_state):
     
     }
     frontier = []
-    frontier.append(start_state)
-    explored = {}
-    results['path'].append(start_state)
+    # frontier.append(start_state)
+    explored = []
+    frontier.append(("start",start_state))
     results['path_cost'] = 0
     results['frontier_count'] = 1
     if start_state == GOAL_STATE:
         return results
-    
-    
-    
-    
+    else:
+        while len(frontier) != 0: #check if the frontier is empty 
+            node = frontier.pop(0) #pop index 0 of the frontir because bfs uses FIFO strategy
+            explored.append(node)#add popped node to explored list
+            results['path'].append(node)
+            results['expanded_count'] = results['expanded_count'] +1 #increment expanded count by 1 
+            if(len(frontier)==0):
+                goto expand
+            str_node = str(node[1])
+            index = str_node.find("0") #index of where the 0 appears
+            succ = node[1].successors()#maintain a dictionary of all successors
+            #now need to expand popped node 
+            nextState_list = [(k,v) for k,v in succ.items()] #make a list of all  the possible successors
+            random.shuffle(nextState_list)#randomize the order 
+            temp_next_state = str(frontier[0][1])
+            cost = int(temp_next_state[index])
+            results['path_cost'] = results['path_cost'] + (cost*cost)
+            label .expand
+            for i in nextState_list:
+                if(i not in frontier) and (i not in explored):
+                    if(i[1] == GOAL_STATE):
+                        results['path'].append(i)
+                        node_str = str(node[1])
+                        print(node_str)
+                        char = node_str.find("0")
+                        print(char)
+                        temp_state = str(i[1])
+                        print(temp_state)
+                        tile_number = int(temp_state[char])
+                        results['path_cost'] = results['path_cost'] + (tile_number*tile_number)
+                        return results
+                    else:
+                        frontier.append(i)
+                        results["frontier_count"] = results["frontier_count"] + 1
 
-
-    
-    
-
-
-    
-
-
-
+                    
 def print_summary(results):
     if 'path' in results:
         print("found solution of length {}, cost {}".format(len(results['path']), 
